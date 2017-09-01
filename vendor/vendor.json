@@ -153,13 +153,13 @@
 			"revisionTime": "2017-08-30T09:01:30Z"
 		},
 		{
-			"checksumSHA1": "RTL7AvvLv8Yqf+2BcU/JXsJSh6M=",
+			"checksumSHA1": "lvhr+dCy+TwvC2Re/JhE8zSWnsY=",
 			"path": "github.com/qframe/collector-tcp",
 			"revision": "5788a9bf52c823c4e93b9bd001fe0c08eef87084",
 			"revisionTime": "2017-09-01T16:53:51Z"
 		},
 		{
-			"checksumSHA1": "M5M7QQFoLPjvOBYKcbuZ1mnDTro=",
+			"checksumSHA1": "otZQbPqo8Ph8dWG8xgnmanPSMxY=",
 			"path": "github.com/qframe/handler-log",
 			"revision": "113b79fa88ee40eb1384496141a8ffd0193b2e5b",
 			"revisionTime": "2017-09-01T16:49:02Z"

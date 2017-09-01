@@ -3,7 +3,6 @@ package qcollector_tcp
 import (
 	"bytes"
 	"fmt"
-	"os"
 	"strings"
 	"time"
 	"net"
@@ -45,7 +44,11 @@ func (p *Plugin) HandleInventoryRequest(qm qtypes_messages.Message) {
 		p.QChan.Data.Send(qm)
 		return
 	}
-	p.Log("trace", fmt.Sprintf("Got msg from %s: %s", qm.Tags["host"], qm.Message))
+	tags := []string{}
+	for k,v := range qm.Tags {
+		tags = append(tags, fmt.Sprintf("%s=%s", k,v))
+	}
+	p.Log("trace", fmt.Sprintf("Got msg from %s: %s", strings.Join(tags, ","), qm.Message))
 	req := qcache_inventory.NewIPContainerRequest(strings.Join(qm.SourcePath,","), qm.Tags["host"])
 	tout := p.CfgIntOr("inventory-timeout-ms", 2000)
 	timeout := time.NewTimer(time.Duration(tout)*time.Millisecond).C
@@ -67,14 +70,16 @@ func (p *Plugin) Run() {
 	host := p.CfgStringOr("bind-host", "0.0.0.0")
 	port := p.CfgStringOr("bind-port", "11001")
 	// Listen for incoming connections.
-	l, err := net.Listen("tcp", host+":"+port)
+	addr :=  host+":"+port
+	l, err := net.Listen("tcp",addr)
+	defer l.Close()
 	if err != nil {
 		p.Log("error", fmt.Sprintln("Error listening:", err.Error()))
-		os.Exit(1)
+		return
 	}
 	// Close the listener when the application closes.
-	defer l.Close()
-	p.Log("info", fmt.Sprintln("Listening on " + host + ":" + port))
+
+	p.Log("info", fmt.Sprintf("Listening on %s", addr))
 	go p.handleRequests(l)
 	for {
 		select {
@@ -85,6 +90,7 @@ func (p *Plugin) Run() {
 				base := qtypes_messages.NewTimedBase(p.Name, time.Now())
 				qm := qtypes_messages.NewMessage(base, im.Msg)
 				qm.Tags["host"] = im.Host
+				p.Log("trace", fmt.Sprintf("Got msg '%s' from '%s", qm.Message, qm.Tags["Host"]))
 				go p.HandleInventoryRequest(qm)
 			default:
 				p.Log("warn", fmt.Sprintf("Unkown data type: %s", reflect.TypeOf(msg)))
@@ -100,7 +106,7 @@ func (p *Plugin) handleRequests(l net.Listener) {
 		conn, err := l.Accept()
 		if err != nil {
 			fmt.Println("Error accepting: ", err.Error())
-			os.Exit(1)
+			continue
 		}
 		// Handle connections in a new goroutine.
 		go p.handleRequest(conn)
@@ -122,11 +128,19 @@ func (p *Plugin) handleRequest(conn net.Conn) {
 	} else {
 		n := bytes.Index(buf, []byte{0})
 		addrTuple := strings.Split(conn.RemoteAddr().String(), ":")
+		host := addrTuple[0]
+		if strings.Count(conn.RemoteAddr().String(), ":") != 1 {
+			if conn.RemoteAddr().String()[1:4] == "::1" {
+				host = "localhost"
+			} else {
+				host = conn.RemoteAddr().String()[1:4]
+			}
+		}
 		im := IncommingMsg{
 			Msg: string(buf[:n-1]),
-			Host: addrTuple[0],
+			Host: host,
 		}
-		p.Log("trace", fmt.Sprintf("Received Raw TCP message '%s' from '%s'", im.Msg, im.Host))
+		p.Log("trace", fmt.Sprintf("Received Raw TCP message '%s' from '%s' (%s)", im.Msg, im.Host, conn.RemoteAddr().String()))
 		p.buffer <- im
 	}
 	// Close the connection when you're done with it.
