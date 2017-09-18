@@ -13,10 +13,11 @@ import (
 	"github.com/qframe/types/qchannel"
 	"github.com/zpatrick/go-config"
 	"github.com/qframe/types/messages"
+	"io"
 )
 
 const (
-	version = "0.2.4"
+	version = "0.2.5"
 	pluginTyp = "collector"
 	pluginPkg = "tcp"
 )
@@ -44,8 +45,8 @@ func (p *Plugin) HandleInventoryRequest(qm qtypes_messages.Message) {
 		p.QChan.Data.Send(qm)
 		return
 	}
-	tags := []string{}
-	for k,v := range qm.Tags {
+	tags := []string{""}
+	for k, v := range qm.Tags {
 		tags = append(tags, fmt.Sprintf("%s=%s", k,v))
 	}
 	p.Log("trace", fmt.Sprintf("Got msg from %s: %s", strings.Join(tags, ","), qm.Message))
@@ -58,6 +59,11 @@ func (p *Plugin) HandleInventoryRequest(qm qtypes_messages.Message) {
 		if resp.Error != nil {
 			p.Log("error", resp.Error.Error())
 			qm.SourceSuccess = false
+		} else {
+			cm := qtypes_messages.NewContainerMessage(qm.Base, resp.Container, qm.Message)
+			p.Log("trace", fmt.Sprintf("Got InventoryResponse: ContainerName:%s | Image:%s", cm.GetContainerName(), cm.Container.Config.Image))
+			p.QChan.Data.Send(cm)
+			return
 		}
 	case <- timeout:
 		p.Log("debug", fmt.Sprintf("Experience timeout for IP %s... continue w/o Container info (SourcePath: %s)", qm.Tags["host"], strings.Join(qm.SourcePath, ",")))
@@ -90,7 +96,6 @@ func (p *Plugin) Run() {
 				base := qtypes_messages.NewTimedBase(p.Name, time.Now())
 				qm := qtypes_messages.NewMessage(base, im.Msg)
 				qm.Tags["host"] = im.Host
-				p.Log("trace", fmt.Sprintf("Got msg '%s' from '%s", qm.Message, qm.Tags["Host"]))
 				go p.HandleInventoryRequest(qm)
 			default:
 				p.Log("warn", fmt.Sprintf("Unkown data type: %s", reflect.TypeOf(msg)))
@@ -123,6 +128,9 @@ func (p *Plugin) handleRequest(conn net.Conn) {
 	buf := make([]byte, 1048576)
 	// Read the incoming connection into the buffer.
 	_, err := conn.Read(buf)
+	if err == io.EOF {
+		return
+	}
 	if err != nil {
 		fmt.Println("Error reading:", err.Error())
 	} else {
@@ -133,14 +141,16 @@ func (p *Plugin) handleRequest(conn net.Conn) {
 			if conn.RemoteAddr().String()[1:4] == "::1" {
 				host = "localhost"
 			} else {
-				host = conn.RemoteAddr().String()[1:4]
+				host = conn.RemoteAddr().String()
 			}
 		}
 		im := IncommingMsg{
-			Msg: string(buf[:n-1]),
+			// TODO: Is -1 wrong here?
+			//Msg: string(buf[:n-1]),
+			Msg: string(buf[:n]),
 			Host: host,
 		}
-		p.Log("trace", fmt.Sprintf("Received Raw TCP message '%s' from '%s' (%s)", im.Msg, im.Host, conn.RemoteAddr().String()))
+		p.Log("trace", fmt.Sprintf("Received Raw TCP message '%s' from '%s'", im.Msg, im.Host))
 		p.buffer <- im
 	}
 	// Close the connection when you're done with it.

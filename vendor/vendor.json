@@ -153,13 +153,13 @@
 			"revisionTime": "2017-09-14T14:05:18Z"
 		},
 		{
-			"checksumSHA1": "lvhr+dCy+TwvC2Re/JhE8zSWnsY=",
+			"checksumSHA1": "Rh7CrMNsOJMhNZNoDQMnY8zaIsQ=",
 			"path": "github.com/qframe/collector-tcp",
-			"revision": "5788a9bf52c823c4e93b9bd001fe0c08eef87084",
-			"revisionTime": "2017-09-01T16:53:51Z"
+			"revision": "4e86739af98daaa2e3700ca0d5a6280ed7ae7c3f",
+			"revisionTime": "2017-09-15T11:29:48Z"
 		},
 		{
-			"checksumSHA1": "otZQbPqo8Ph8dWG8xgnmanPSMxY=",
+			"checksumSHA1": "9AgyBPBGfCO4XLcNowRjRW9H2q8=",
 			"path": "github.com/qframe/handler-log",
 			"revision": "113b79fa88ee40eb1384496141a8ffd0193b2e5b",
 			"revisionTime": "2017-09-01T16:49:02Z"
@@ -179,14 +179,14 @@
 		{
 			"checksumSHA1": "qTxHjY8oFOfYzlsu582xuqckC50=",
 			"path": "github.com/qframe/types/docker-events",
-			"revision": "601a5f89458ccacbff7347cad0421e8f9100c8a1",
-			"revisionTime": "2017-08-29T15:12:35Z"
+			"revision": "5a2e0b967cd1433a21bb492a385c604c92f924bd",
+			"revisionTime": "2017-09-15T11:27:33Z"
 		},
 		{
-			"checksumSHA1": "IypK2Ok21t3MqgtbokuPmA9ZSBY=",
+			"checksumSHA1": "bu3TUas4vsPjIgv919gHxlXT+YE=",
 			"path": "github.com/qframe/types/helper",
-			"revision": "601a5f89458ccacbff7347cad0421e8f9100c8a1",
-			"revisionTime": "2017-08-29T15:12:35Z"
+			"revision": "5a2e0b967cd1433a21bb492a385c604c92f924bd",
+			"revisionTime": "2017-09-15T11:27:33Z"
 		},
 		{
 			"checksumSHA1": "ngjQWovypCOQOmrmfDrJGmTPeNw=",
@@ -207,10 +207,16 @@
 			"revisionTime": "2017-09-15T11:27:33Z"
 		},
 		{
+			"checksumSHA1": "tjAWeTWbGnQle1FFOHnGquI7Hc8=",
+			"path": "github.com/qframe/types/syslog",
+			"revision": "5a2e0b967cd1433a21bb492a385c604c92f924bd",
+			"revisionTime": "2017-09-15T11:27:33Z"
+		},
+		{
 			"checksumSHA1": "aWT8tf2NLTwFLrrTSEZCraccjMI=",
 			"path": "github.com/qframe/types/ticker",
-			"revision": "601a5f89458ccacbff7347cad0421e8f9100c8a1",
-			"revisionTime": "2017-08-29T15:12:35Z"
+			"revision": "5a2e0b967cd1433a21bb492a385c604c92f924bd",
+			"revisionTime": "2017-09-15T11:27:33Z"
 		},
 		{
 			"checksumSHA1": "m8hYD/alsufIYIM7sR06wbL+dKo=",
