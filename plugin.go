@@ -87,6 +87,20 @@ func (p *Plugin) Run() {
 				} else {
 					p.Log("debug", fmt.Sprintf("Send %d bytes: '%s'", b, qm.Message.Message))
 				}
+			case qtypes_messages.SyslogMessage:
+				sm := val.(qtypes_messages.SyslogMessage)
+				p.Log("trace", "received qtypes_messages.SyslogMessage")
+				if sm.StopProcessing(p.Plugin, false) {
+					continue
+				}
+				msg, err := sm.ToRFC5424()
+
+				b, err := fmt.Fprintf(conn, msg + "\n")
+				if err != nil {
+					p.Log("error", fmt.Sprintf("Error sending '%s': %s", msg, err.Error()))
+				} else {
+					p.Log("debug", fmt.Sprintf("Send %d bytes: '%s'", b, msg))
+				}
 			default:
 				if ignoreContainerEvents {
 					continue

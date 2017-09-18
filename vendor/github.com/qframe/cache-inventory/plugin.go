@@ -32,6 +32,7 @@ type Plugin struct {
 	*qtypes_plugin.Plugin
 	Inventory Inventory
 	engCli *client.Client
+	engInfo types.Info
 
 }
 
@@ -55,12 +56,12 @@ func (p *Plugin) Run() {
 		p.Log("error", fmt.Sprintf("Could not connect docker/docker/client to '%s': %v", dockerHost, err))
 		return
 	}
-	info, err := p.engCli.Info(ctx)
+	p.engInfo, err = p.engCli.Info(ctx)
 	if err != nil {
-		p.Log("error", fmt.Sprintf("Error during Info(): %v >err> %s", info, err.Error()))
+		p.Log("error", fmt.Sprintf("Error during Info(): %v >err> %s", p.engInfo, err.Error()))
 		return
 	} else {
-		p.Log("info", fmt.Sprintf("Connected to '%s' / v'%s'", info.Name, info.ServerVersion))
+		p.Log("info", fmt.Sprintf("Connected to '%s' / v'%s'", p.engInfo.Name, p.engInfo.ServerVersion))
 	}
 	for {
 		select {
@@ -80,7 +81,6 @@ func (p *Plugin) Run() {
 				}
 			default:
 				p.Log("trace", fmt.Sprintf("Dunno type '%s': %v", reflect.TypeOf(val), val))
-
 			}
 		case <- ticker:
 			p.Log("trace", "Ticker came along: p.Inventory.CheckRequests()")
@@ -100,7 +100,7 @@ func (p *Plugin) LookUpContainer(cnt *types.ContainerJSON) {
 		p.Log("error", fmt.Sprintf("Error during AddNetworkIPs(): %s", err.Error()))
 	}
 	p.Log("debug", fmt.Sprintf("Add CntID:%s into Inventory (name:%s, IPs:%s)",cnt.ID[:13], cnt.Name, strings.Join(ips,",")))
-	p.Inventory.SetItem(cnt.ID, cnt, ips)
+	p.Inventory.SetItem(cnt.ID, cnt, p.engInfo, ips)
 }
 
 func (p *Plugin) AddNetworkIPs(ips  mapset.Set, container *types.ContainerJSON) (res []string, err error) {
