@@ -122,10 +122,11 @@ func (p *Plugin) sendSyslog(conn io.Writer, kv map[string]string, setSyslogCeeKe
 	if err != nil {
 		return fmt.Errorf("error creating syslog5424 message: %s", err.Error())
 	}
-	p.Log("debug", fmt.Sprintf("Sending '%s'", msg))
-	_, err = fmt.Fprintf(conn, msg + "\n")
+	b, err := fmt.Fprintf(conn, msg + "\n")
 	if err != nil {
 		return fmt.Errorf("rrror sending '%s': %s", msg, err.Error())
+	} else {
+		p.Log("debug", fmt.Sprintf("Send %d bytes: '%s'", b, msg))
 	}
 	return
 
