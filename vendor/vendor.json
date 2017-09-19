@@ -153,10 +153,10 @@
 			"revisionTime": "2017-09-18T08:38:42Z"
 		},
 		{
-			"checksumSHA1": "8eJkgN3D9mbgMuzZYEXkfGYHFNI=",
+			"checksumSHA1": "QkhVQtXgTDiWGWeo76nknSSQfSs=",
 			"path": "github.com/qframe/collector-tcp",
-			"revision": "c5e4e47d1e4815d6d73bae0415198ef74c87459e",
-			"revisionTime": "2017-09-18T08:41:22Z"
+			"revision": "fcbf44fe5c309b47f0677d8369595ac32184833e",
+			"revisionTime": "2017-09-19T11:29:01Z"
 		},
 		{
 			"checksumSHA1": "9AgyBPBGfCO4XLcNowRjRW9H2q8=",
@@ -177,6 +177,12 @@
 			"revisionTime": "2017-09-18T11:38:17Z"
 		},
 		{
+			"checksumSHA1": "1bYhfK64PMCq1kdgHv5sj1c6lYA=",
+			"path": "github.com/qframe/types/container/stats",
+			"revision": "26b2dac9b669dd5c130550dfe0f76b6714dfebe1",
+			"revisionTime": "2017-09-18T11:38:17Z"
+		},
+		{
 			"checksumSHA1": "qTxHjY8oFOfYzlsu582xuqckC50=",
 			"path": "github.com/qframe/types/docker-events",
 			"revision": "26b2dac9b669dd5c130550dfe0f76b6714dfebe1",
@@ -191,6 +197,12 @@
 		{
 			"checksumSHA1": "aYjsG0MFHOGuXk7BcR+UWvW8Vf8=",
 			"path": "github.com/qframe/types/messages",
+			"revision": "26b2dac9b669dd5c130550dfe0f76b6714dfebe1",
+			"revisionTime": "2017-09-18T11:38:17Z"
+		},
+		{
+			"checksumSHA1": "NLw8NMX4Cj04OGLdD7iktgiNi/I=",
+			"path": "github.com/qframe/types/metrics",
 			"revision": "26b2dac9b669dd5c130550dfe0f76b6714dfebe1",
 			"revisionTime": "2017-09-18T11:38:17Z"
 		},

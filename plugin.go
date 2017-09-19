@@ -12,6 +12,7 @@ import (
 	"github.com/qframe/types/constants"
 	"github.com/qframe/types/syslog"
 	"io"
+	"github.com/qframe/types/metrics"
 )
 
 const (
@@ -37,6 +38,8 @@ func (p *Plugin) Run() {
 	bg := p.QChan.Data.Join()
 	host := p.CfgStringOr("host", "127.0.0.1")
 	port := p.CfgStringOr("port", "10001")
+	dropPut := p.CfgBoolOr("drop-opentsdb-put", false)
+	// TODO: This should go away...
 	isSyslog := p.CfgBoolOr("syslog5424", false)
 	setSyslogCeeKey := p.CfgStringOr("syslog5424-cee-key", "")
 	ignoreContainerEvents := p.CfgBoolOr("ignore-container-events", true)
@@ -56,6 +59,7 @@ func (p *Plugin) Run() {
 				if qm.StopProcessing(p.Plugin, false) {
 					continue
 				}
+				// TODO: This should go away as it is handled by the SyslogMessage.
 				if isSyslog {
 					err := p.sendSyslog(conn, qm.Tags, setSyslogCeeKey)
 					if err != nil {
@@ -74,6 +78,7 @@ func (p *Plugin) Run() {
 				if qm.StopProcessing(p.Plugin, false) {
 					continue
 				}
+				// TODO: This should go away as it is handled by the SyslogMessage.
 				if isSyslog {
 					err := p.sendSyslog(conn, qm.Tags, setSyslogCeeKey)
 					if err != nil {
@@ -89,12 +94,23 @@ func (p *Plugin) Run() {
 				}
 			case qtypes_messages.SyslogMessage:
 				sm := val.(qtypes_messages.SyslogMessage)
-				p.Log("trace", "received qtypes_messages.SyslogMessage")
 				if sm.StopProcessing(p.Plugin, false) {
 					continue
 				}
 				msg, err := sm.ToRFC5424()
 
+				b, err := fmt.Fprintf(conn, msg + "\n")
+				if err != nil {
+					p.Log("error", fmt.Sprintf("Error sending '%s': %s", msg, err.Error()))
+				} else {
+					p.Log("debug", fmt.Sprintf("Send %d bytes: '%s'", b, msg))
+				}
+			case qtypes_metrics.Metric:
+				qm := val.(qtypes_metrics.Metric)
+				if qm.StopProcessing(p.Plugin, false) {
+					continue
+				}
+				msg := qm.ToOpenTSDBLine(dropPut)
 				b, err := fmt.Fprintf(conn, msg + "\n")
 				if err != nil {
 					p.Log("error", fmt.Sprintf("Error sending '%s': %s", msg, err.Error()))
